@@ -2,11 +2,13 @@ function love.load()
 
     -- Includes --
         require("patterns")
+        require("fonts")
+        require("life")
     --------------
 
 
-    -- Init global vars --
-        cells = galaxy
+    -- Initialization --
+        life.cells = galaxy
 
         background = love.graphics.newImage("res/background.png")
         background:setFilter("linear", "linear")
@@ -37,56 +39,23 @@ function love.load()
     -------------------
 
 
+    -- Set up UI --
+        life.addText("Game of Life", 16, 5, "title")
+    ---------------
+
+
     timer = 0
-    ticktime = 1
-    generation = 1
+    ticktime = 0.2
 end
 
 function love.update(dt)
 
     timer = timer + dt
     if timer > ticktime then
+
         -- Next generation
-        local check = {}
+        life.nextgen()
 
-        -- Add live cells and neighbours to table to check
-        for k,v in pairs(cells) do
-            for x = v.x-1, v.x+1 do
-                for y = v.y-1, v.y+1 do
-                    if not check[x] then check[x] = {} end
-                    if not check[x][y] or check[x][y] == 0 then check[x][y] = (x == v.x and y == v.y) and k or 0 end
-                end
-            end
-        end
-
-        -- Iterate through live cells and neighbours
-        for x,r in pairs(check) do
-            for y,c in pairs(r) do
-
-                -- Count neighbours
-                local neighbours = 0
-                for xc = x-1, x+1 do
-                    for yc = y-1, y+1 do
-                        if not (xc == x and yc == y) and check[xc] and check[xc][yc] and check[xc][yc] > 0 then
-                            neighbours = neighbours + 1
-                        end
-                    end
-                end
-
-                -- Under-/overpopulation
-                if neighbours < 2 or neighbours > 3 then
-                    cells[c] = nil
-                end
-
-                -- Birth to a new cell
-                if c == 0 and neighbours == 3 then
-                    table.insert(cells, {x=x, y=y})
-                end
-            end
-        end
-
-        -- Increase generation counter and reset timer
-        generation = generation + 1
         timer = timer - ticktime
     end
 end
@@ -101,15 +70,6 @@ function love.draw()
     love.graphics.draw(grid_canvas, 0, 0)
 
 
-    -- Draw all cells
-    love.graphics.push()
-        -- love.graphics.translate(400, 300) -- Move 0,0 on grid to x,y on screen
-        love.graphics.scale(10)
-
-        -- Draw cells
-        love.graphics.setColor(251, 253, 255, 255)
-        for k,v in pairs(cells) do
-            love.graphics.rectangle("fill", v.x, v.y, 1, 1)
-        end
-    love.graphics.pop()
+    -- Draw life
+    life.draw()
 end
