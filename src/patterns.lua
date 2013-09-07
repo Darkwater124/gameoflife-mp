@@ -1,4 +1,6 @@
-gospergun = {
+patterns = {}
+
+patterns.gospergun = {
     -- Gosper Glider Guns
     {x= 1, y= 5}, {x= 2, y= 5}, {x= 1, y= 6}, {x= 2, y= 6}, {x=15, y= 6}, {x=16, y= 4},
     {x=17, y= 5}, {x=17, y= 6}, {x=18, y= 6}, {x=17, y= 7}, {x=16, y= 8}, {x=14, y= 3},
@@ -21,7 +23,7 @@ gospergun = {
     {x=79-35, y=59- 3}, {x=79-35, y=59- 4}, {x=79-36, y=59- 3}, {x=79-36, y=59- 4},
 }
 
-pentoad = {
+patterns.pentoad = {
     -- Pentoad
     {x= 12, y=  0},
     {x= 11, y=  0},
@@ -47,7 +49,7 @@ pentoad = {
     {x=  0, y= 11},
 }
 
-galaxy = {
+patterns.galaxy = {
     -- Kok's galaxy
     {x= 3, y= 3},    {x= 6, y= 3},    {x=10, y= 6},    {x= 3, y=10},
     {x= 4, y= 3},    {x= 6, y= 4},    {x=11, y= 6},    {x= 3, y=11},

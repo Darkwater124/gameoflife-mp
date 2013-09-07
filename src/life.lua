@@ -1,23 +1,23 @@
 life = {}
 life.cells = {}
-life.ui = {}
+-- life.ui = {}
 life.generation = 1
 
-function life.addText(text, x, y, font)
-    local xpos = 0
+-- function life.addText(text, x, y, font)
+--     local xpos = 0
 
-    for c in text:gmatch "." do
-        local glyph, width = fonts.getGlyph(font, c)
+--     for c in text:gmatch "." do
+--         local glyph, width = fonts.getGlyph(font, c)
 
-        for k,v in pairs(glyph) do
-            v.x = v.x + x - 1 + xpos
-            v.y = v.y + y - 1
-            table.insert(life.ui, v)
-        end
+--         for k,v in pairs(glyph) do
+--             v.x = v.x + x - 1 + xpos
+--             v.y = v.y + y - 1
+--             table.insert(life.ui, v)
+--         end
 
-        xpos = xpos + width
-    end
-end
+--         xpos = xpos + width
+--     end
+-- end
 
 function life.nextgen()
     local check = {}
@@ -81,15 +81,15 @@ function life.draw()
         love.graphics.scale(10)
 
         -- Draw cells
-        love.graphics.setColor(251, 253, 255, 255)
+        love.graphics.setColor(255, 255, 255, 230)
         for k,v in pairs(life.cells) do
             love.graphics.rectangle("fill", v.x, v.y, 1, 1)
         end
 
-        -- Draw UI
-        love.graphics.setColor(251, 253, 255, 255)
-        for k,v in pairs(life.ui) do
-            love.graphics.rectangle("fill", v.x, v.y, 1, 1)
-        end
+        -- -- Draw UI
+        -- love.graphics.setColor(255, 255, 255, 230)
+        -- for k,v in pairs(life.ui) do
+        --     love.graphics.rectangle("fill", v.x, v.y, 1, 1)
+        -- end
     love.graphics.pop()
 end

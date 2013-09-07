@@ -1,17 +1,26 @@
 function love.load()
 
     -- Includes --
+        require("utils")
         require("patterns")
         require("fonts")
         require("life")
+        require("elements")
+        require("ui")
     --------------
 
 
     -- Initialization --
-        life.cells = galaxy
+        for k,v in pairs(patterns.galaxy) do
+            local x = v.x + 10
+            local y = v.y
+            table.insert(life.cells, {x=x, y=y})
+        end
 
-        background = love.graphics.newImage("res/background.png")
+        background = love.graphics.newImage("res/background_grayscale.png")
         background:setFilter("linear", "linear")
+
+        love.keyboard:setKeyRepeat(true)
     ----------------------
 
 
@@ -40,15 +49,26 @@ function love.load()
 
 
     -- Set up UI --
-        life.addText("Game of Life", 16, 5, "title")
+        ui.add(elements.text({ text  = "game of",  x = 280, y =  20, scale = 10 }))
+        ui.add(elements.text({ text  = "lIfe mp",  x = 280, y =  80, scale = 10 })) -- Capital I is 5x5, lowercase i is 3x5
+        ui.add(elements.text({ text  = "join",     x = 100, y = 200, scale =  8 }))
+        ui.add(elements.text({ text  = "host",     x = 516, y = 200, scale =  8 }))
+
+        ui.add(elements.textinput({ label = "ip address", x =  50, y = 260, width = 270, scale = 3, tabindex = 1 }))
+        ui.add(elements.textinput({ label = "port",       x =  50, y = 300, width = 150, scale = 3, tabindex = 2 }))
+        ui.add(   elements.button({ label = "join",       x = 210, y = 300, width = 110, scale = 3, tabindex = 3, callback = function ()
+
+        end }))
     ---------------
 
 
+    uptime = 0
     timer = 0
     ticktime = 0.2
 end
 
 function love.update(dt)
+    uptime = uptime + dt
 
     timer = timer + dt
     if timer > ticktime then
@@ -58,12 +78,16 @@ function love.update(dt)
 
         timer = timer - ticktime
     end
+
+    ui.update()
 end
 
 function love.draw()
+    love.graphics.setLineWidth(1)
 
     -- Background and grid
-    love.graphics.setColor(255, 255, 255, 255)
+    local r,g,b,a = HSL(life.generation % 360, 1, 0.9, 1)
+    love.graphics.setColor(r * 255, g * 255, b * 255, a * 255)
     love.graphics.draw(background, 0, 0, 0, 800, 600, 0.5, 0.5)
 
     love.graphics.setColor(255, 255, 255, 50)
@@ -72,4 +96,24 @@ function love.draw()
 
     -- Draw life
     life.draw()
+
+
+    -- Draw UI
+    ui.draw()
+end
+
+function love.mousepressed(x, y, but)
+    ui.mousepressed(x, y, but)
+end
+
+function love.mousereleased(x, y, but)
+    ui.mousereleased(x, y, but)
+end
+
+function love.textinput(char)
+    ui.textinput(char)
+end
+
+function love.keypressed(key, isrepeat)
+    ui.keypressed(key, isrepeat)
 end
