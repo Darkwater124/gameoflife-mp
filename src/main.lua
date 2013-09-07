@@ -54,9 +54,20 @@ function love.load()
         ui.add(elements.text({ text  = "join",     x = 100, y = 200, scale =  8 }))
         ui.add(elements.text({ text  = "host",     x = 516, y = 200, scale =  8 }))
 
-        ui.add(elements.textinput({ label = "ip address", x =  50, y = 260, width = 270, scale = 3, tabindex = 1 }))
-        ui.add(elements.textinput({ label = "port",       x =  50, y = 300, width = 150, scale = 3, tabindex = 2 }))
-        ui.add(   elements.button({ label = "join",       x = 210, y = 300, width = 110, scale = 3, tabindex = 3, callback = function ()
+
+        -- Join
+        ui.add("ipaddr_input", elements.textinput({ label = "ip address", x =  50, y = 260, width = 270, scale = 3, tabindex = 1 }))
+        ui.add("port_input",   elements.textinput({ label = "port",       x =  50, y = 300, width = 150, scale = 3, tabindex = 2 }))
+
+        ui.add(elements.button({ label = "join", x = 210, y = 300, width = 110, scale = 3, tabindex = 3, callback = function ()
+            print(ui.getElementById("ipaddr_input").value, ui.getElementById("port_input").value)
+        end }))
+
+
+        -- Host
+        ui.add(elements.textinput({ label = "port",       x = 480, y = 260, width = 150, scale = 3, tabindex = 12 }))
+
+        ui.add(elements.button({ label = "host", x = 640, y = 260, width = 110, scale = 3, tabindex = 13, callback = function ()
 
         end }))
     ---------------

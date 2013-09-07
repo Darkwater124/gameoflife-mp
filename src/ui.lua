@@ -1,9 +1,8 @@
 ui = {}
 ui.elements = {}
-ui.currentCursor = "arrow"
+ui.stringIds = {}
+ui.currentCursor = "default"
 ui.nextId = 1
-
-ui.pressFocus = 0
 ui.focus = 0
 
 -- Init cursors --
@@ -54,13 +53,34 @@ function ui.draw()
     end
 end
 
-function ui.add(obj)
+function ui.add(id, obj)
+    if type(id) == "table" then
+        obj = id
+        id = nil
+    end
+
     if not obj then return false end
 
-    ui.elements[ui.nextId] = obj
-    ui.nextId = ui.nextId + 1
+    if id then
+        if ui.stringIds[id] then
+            error("ID " .. id .. " is already in use!")
+        else
+            ui.stringIds[id] = ui.nextId
+        end
+    end
 
-    return true
+    ui.elements[ui.nextId] = obj
+
+    ui.nextId = ui.nextId + 1
+    return obj, ui.nextId - 1
+end
+
+function ui.getElementById(id)
+    if not id or not ui.stringIds[id] then
+        return nil
+    end
+
+    return ui.elements[ui.stringIds[id]]
 end
 
 function ui.setCursor(type)
@@ -70,58 +90,86 @@ function ui.setCursor(type)
     end
 end
 
+function ui.setFocus(id)
+    if not ui.elements[id] then return end
+
+    ui.focus = id
+    ui.elements[id].focussed = true
+
+    if ui.elements[id].onfocus then
+        ui.elements[id]:onfocus()
+    end
+end
+
 
 function ui.mousepressed(x, y, but)
-    local keepfocus = fasle
+    local gotFocus = false
 
     for k,v in pairs(ui.elements) do
         v.pressing = false
 
         if v.focussable then
             if x > v.area.x and x < v.area.x + v.area.width and y > v.area.y and y < v.area.y + v.area.height then
-                if ui.focus == k then
-                    keepfocus = true
+                if ui.focus ~= k then
+                    ui.setFocus(k)
                 end
 
-                ui.pressFocus = k
+                if v.mousepressed then
+                    v:mousepressed(x, y, but)
+                end
+
+                gotFocus = true
                 v.pressing = true
                 break
             end
         end
     end
 
-    if not keepfocus then
+    if not gotFocus then
+        if ui.elements[ui.focus] then
+            ui.elements[ui.focus].focussed = false
+        end
+
         ui.focus = 0
     end
 end
 
 function ui.mousereleased(x, y, but)
-    if ui.pressFocus > 0 and ui.elements[ui.pressFocus] then
-        local v = ui.elements[ui.pressFocus]
+    for k,v in pairs(ui.elements) do
         v.pressing = false
-
-        if v.focussable then
-            if x > v.area.x and x < v.area.x + v.area.width and y > v.area.y and y < v.area.y + v.area.height then
-                ui.focus = ui.pressFocus
-
-                if v.onfocus then
-                    v:onfocus()
-                end
-            end
-        end
     end
 
-    ui.pressFocus = 0
+    if ui.elements[ui.focus] and ui.elements[ui.focus].mousereleased and x > v.area.x and x < v.area.x + v.area.width and y > v.area.y and y < v.area.y + v.area.height then
+        ui.elements[ui.focus]:mousereleased(x, y, but)
+    end
 end
 
 function ui.textinput(char)
-    if ui.elements[ui.focus].textinput then
+    if ui.elements[ui.focus] and ui.elements[ui.focus].textinput then
         ui.elements[ui.focus]:textinput(char)
     end
 end
 
-function ui.keypressed(key, isrepeat)
-    if ui.elements[ui.focus].keypressed then
+function ui.keypressed(key, isrepeat)                                           -- For some reason, 0 evaluates to true -_-
+    if key == "tab" and ui.elements[ui.focus] and ui.elements[ui.focus].tabindex and ui.elements[ui.focus].tabindex > 0 then
+        local targettab = 99999999
+        local target = 0
+
+        for k,v in pairs(ui.elements) do
+            if v.tabindex and v.tabindex > ui.elements[ui.focus].tabindex and v.tabindex < targettab then
+                targettab = v.tabindex
+                target = k
+            end
+        end
+
+        if target > 0 then
+            ui.setFocus(target)
+        end
+
+        return
+    end
+
+    if ui.elements[ui.focus] and ui.elements[ui.focus].keypressed then
         ui.elements[ui.focus]:keypressed(key, isrepeat)
     end
 end
