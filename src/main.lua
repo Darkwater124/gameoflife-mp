@@ -60,15 +60,15 @@ function love.load()
         ui.add("port_input",   elements.textinput({ label = "port",       x =  50, y = 300, width = 150, scale = 3, tabindex = 2 }))
 
         ui.add(elements.button({ label = "join", x = 210, y = 300, width = 110, scale = 3, tabindex = 3, callback = function ()
-            print(ui.getElementById("ipaddr_input").value, ui.getElementById("port_input").value)
+            
         end }))
 
 
         -- Host
-        ui.add(elements.textinput({ label = "port",       x = 480, y = 260, width = 150, scale = 3, tabindex = 12 }))
+        ui.add(elements.textinput({ label = "port", x = 480, y = 260, width = 150, scale = 3, tabindex = 12 }))
 
         ui.add(elements.button({ label = "host", x = 640, y = 260, width = 110, scale = 3, tabindex = 13, callback = function ()
-
+            
         end }))
     ---------------
 
@@ -127,4 +127,8 @@ end
 
 function love.keypressed(key, isrepeat)
     ui.keypressed(key, isrepeat)
+end
+
+function love.keyreleased(key)
+    ui.keyreleased(key)
 end

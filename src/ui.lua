@@ -139,7 +139,7 @@ function ui.mousereleased(x, y, but)
         v.pressing = false
     end
 
-    if ui.elements[ui.focus] and ui.elements[ui.focus].mousereleased and x > v.area.x and x < v.area.x + v.area.width and y > v.area.y and y < v.area.y + v.area.height then
+    if ui.elements[ui.focus] and ui.elements[ui.focus].mousereleased and x > ui.elements[ui.focus].area.x and x < ui.elements[ui.focus].area.x + ui.elements[ui.focus].area.width and y > ui.elements[ui.focus].area.y and y < ui.elements[ui.focus].area.y + ui.elements[ui.focus].area.height then
         ui.elements[ui.focus]:mousereleased(x, y, but)
     end
 end
@@ -152,13 +152,23 @@ end
 
 function ui.keypressed(key, isrepeat)                                           -- For some reason, 0 evaluates to true -_-
     if key == "tab" and ui.elements[ui.focus] and ui.elements[ui.focus].tabindex and ui.elements[ui.focus].tabindex > 0 then
-        local targettab = 99999999
+        local targettab = 0
         local target = 0
 
-        for k,v in pairs(ui.elements) do
-            if v.tabindex and v.tabindex > ui.elements[ui.focus].tabindex and v.tabindex < targettab then
-                targettab = v.tabindex
-                target = k
+        if love.keyboard.isDown("lshift", "rshift") then
+            for k,v in pairs(ui.elements) do
+                if v.tabindex and v.tabindex < ui.elements[ui.focus].tabindex and v.tabindex > targettab then
+                    targettab = v.tabindex
+                    target = k
+                end
+            end
+        else
+            targettab = 99999999
+            for k,v in pairs(ui.elements) do
+                if v.tabindex and v.tabindex > ui.elements[ui.focus].tabindex and v.tabindex < targettab then
+                    targettab = v.tabindex
+                    target = k
+                end
             end
         end
 
@@ -171,5 +181,11 @@ function ui.keypressed(key, isrepeat)                                           
 
     if ui.elements[ui.focus] and ui.elements[ui.focus].keypressed then
         ui.elements[ui.focus]:keypressed(key, isrepeat)
+    end
+end
+
+function ui.keyreleased(key)
+    if ui.elements[ui.focus] and ui.elements[ui.focus].keyreleased then
+        ui.elements[ui.focus]:keyreleased(key)
     end
 end
