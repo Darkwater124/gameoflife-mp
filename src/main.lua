@@ -1,12 +1,16 @@
 function love.load()
 
     -- Includes --
+        require("enet")
+        require("json")
+
         require("utils")
         require("patterns")
         require("fonts")
         require("life")
         require("elements")
         require("ui")
+        require("net")
     --------------
 
 
@@ -51,25 +55,33 @@ function love.load()
     -- Set up UI --
         ui.add(elements.text({ text  = "game of",  x = 280, y =  20, scale = 10 }))
         ui.add(elements.text({ text  = "lIfe mp",  x = 280, y =  80, scale = 10 })) -- Capital I is 5x5, lowercase i is 3x5
-        ui.add(elements.text({ text  = "join",     x = 100, y = 200, scale =  8 }))
-        ui.add(elements.text({ text  = "host",     x = 516, y = 200, scale =  8 }))
 
 
-        -- Join
-        ui.add("ipaddr_input", elements.textinput({ label = "ip address", x =  50, y = 260, width = 270, scale = 3, tabindex = 1 }))
-        ui.add("port_input",   elements.textinput({ label = "port",       x =  50, y = 300, width = 150, scale = 3, tabindex = 2 }))
+        -- Join --
+            ui.add(elements.text({ text  = "join",     x = 100, y = 200, scale =  8 }))
+            ui.add("ipaddr", elements.textinput({ label = "ip address", x =  50, y = 260, width = 270, scale = 3, tabindex = 1 }))
+            ui.add("port",   elements.textinput({ label = "port",       x =  50, y = 300, width = 150, scale = 3, tabindex = 2 }))
 
-        ui.add(elements.button({ label = "join", x = 210, y = 300, width = 110, scale = 3, tabindex = 3, callback = function ()
-            
-        end }))
+            ui.add(elements.button({ label = "join", x = 210, y = 300, width = 110, scale = 3, tabindex = 3, callback = function ()
+                net.joinLobby(ui.getElementById("ipaddr").value, ui.getElementById("port").value)
+            end }))
+        ----------
 
 
-        -- Host
-        ui.add(elements.textinput({ label = "port", x = 480, y = 260, width = 150, scale = 3, tabindex = 12 }))
+        -- Host --
+            ui.add(elements.text({ text  = "host",     x = 516, y = 200, scale =  8 }))
+            ui.add("hostport", elements.textinput({ label = "port", x = 480, y = 260, width = 150, scale = 3, tabindex = 12 }))
 
-        ui.add(elements.button({ label = "host", x = 640, y = 260, width = 110, scale = 3, tabindex = 13, callback = function ()
-            
-        end }))
+            ui.add(elements.button({ label = "host", x = 640, y = 260, width = 110, scale = 3, tabindex = 13, callback = function ()
+                net.startHostingLobby(ui.getElementById("hostport").value)
+            end }))
+        ----------
+
+
+        -- Options --
+            ui.add(elements.text({ text  = "nickname",  x = 50, y = 480, scale =  3 }))
+            ui.add("nickname", elements.textinput({ value = "darkwater", x = 50, y = 500, width = 150, scale = 2, tabindex = 21 }))
+        -------------
     ---------------
 
 
@@ -80,6 +92,8 @@ end
 
 function love.update(dt)
     uptime = uptime + dt
+
+    net.update()
 
     timer = timer + dt
     if timer > ticktime then
@@ -127,8 +141,18 @@ end
 
 function love.keypressed(key, isrepeat)
     ui.keypressed(key, isrepeat)
+
+    if key == "up" then
+        ticktime = ticktime * 1.05
+    elseif key == "down" then
+        ticktime = ticktime / 1.05
+    end
 end
 
 function love.keyreleased(key)
     ui.keyreleased(key)
+end
+
+function love.quit()
+    net.shutdown()
 end

@@ -101,6 +101,14 @@ function ui.setFocus(id)
     end
 end
 
+function ui.clear()
+    -- for k,v in pairs(ui.elements) do
+    --     -- Call some :destroy() function or so
+    -- end
+    
+    ui.elements = {}
+end
+
 
 function ui.mousepressed(x, y, but)
     local gotFocus = false
