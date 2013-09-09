@@ -107,6 +107,7 @@ function ui.clear()
     -- end
     
     ui.elements = {}
+    ui.stringIds = {}
 end
 
 

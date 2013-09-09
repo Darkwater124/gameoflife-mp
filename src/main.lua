@@ -9,6 +9,7 @@ function love.load()
         require("fonts")
         require("life")
         require("elements")
+        require("lobby")
         require("ui")
         require("net")
     --------------
@@ -63,6 +64,7 @@ function love.load()
             ui.add("port",   elements.textinput({ label = "port",       x =  50, y = 300, width = 150, scale = 3, tabindex = 2 }))
 
             ui.add(elements.button({ label = "join", x = 210, y = 300, width = 110, scale = 3, tabindex = 3, callback = function ()
+                net.username = ui.getElementById("username").value
                 net.joinLobby(ui.getElementById("ipaddr").value, ui.getElementById("port").value)
             end }))
         ----------
@@ -73,14 +75,16 @@ function love.load()
             ui.add("hostport", elements.textinput({ label = "port", x = 480, y = 260, width = 150, scale = 3, tabindex = 12 }))
 
             ui.add(elements.button({ label = "host", x = 640, y = 260, width = 110, scale = 3, tabindex = 13, callback = function ()
+                net.username = ui.getElementById("username").value
                 net.startHostingLobby(ui.getElementById("hostport").value)
+                lobby.setHostname(net.username)
             end }))
         ----------
 
 
         -- Options --
             ui.add(elements.text({ text  = "nickname",  x = 50, y = 480, scale =  3 }))
-            ui.add("nickname", elements.textinput({ value = "darkwater", x = 50, y = 500, width = 150, scale = 2, tabindex = 21 }))
+            ui.add("username", elements.textinput({ value = "darkwater", x = 50, y = 500, width = 150, scale = 2, tabindex = 21 }))
         -------------
     ---------------
 

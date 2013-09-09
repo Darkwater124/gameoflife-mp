@@ -26,16 +26,17 @@ end
 -- Text input with selections
 function elements.textinput(obj)
     obj = validateOptions(obj, {
-        label          = { type= "string",  default= ""     },
-        value          = { type= "string",  default= ""     },
-        x              = { type= "number",  required= true  },
-        y              = { type= "number",  required= true  },
-        width          = { type= "number",  default= 300    },
-        scale          = { type= "number",  default= 5      },
-        tabindex       = { type= "number",  default= 0      },
-        disabled       = { type= "boolean", default= false  },
-        selectionstart = { type= "number",  default= 0      },
-        selectionend   = { type= "number",  default= 0      },
+        label           = { type= "string",  default= ""     },
+        value           = { type= "string",  default= ""     },
+        x               = { type= "number",  required= true  },
+        y               = { type= "number",  required= true  },
+        width           = { type= "number",  default= 300    },
+        scale           = { type= "number",  default= 5      },
+        tabindex        = { type= "number",  default= 0      },
+        disabled        = { type= "boolean", default= false  },
+        selectionstart  = { type= "number",  default= 0      },
+        selectionend    = { type= "number",  default= 0      },
+        cursorblinktime = { type= "number",  default= 0      },
     })
 
     if not obj then return false end
@@ -55,6 +56,10 @@ function elements.textinput(obj)
     end
 
     obj.textinput = function (self, char)
+        if fonts.A:getWidth(char:lower()) < 1 then
+            return
+        end
+
         self.value = self.value:sub(1, math.min(self.selectionstart, self.selectionend)) .. char:lower() .. self.value:sub(math.max(self.selectionstart, self.selectionend)+1, #self.value)
         self:setCursor(math.min(self.selectionstart, self.selectionend) + 1)
     end
@@ -91,6 +96,8 @@ function elements.textinput(obj)
     end
 
     obj.keypressed = function (self, key, isrepeat)
+        self.cursorblinktime = uptime
+
         if key == "backspace" then
             self.value = self.value:sub(1, math.max(0, self.selectionend - 1)) .. self.value:sub(self.selectionend+1, #self.value)
             self:setCursor(self.selectionstart - 1)
@@ -147,7 +154,7 @@ function elements.textinput(obj)
             love.graphics.print(self.value, textx, texty, 0, self.scale, self.scale, 0, 1)
 
             -- Cursor
-            if self.focussed and uptime % 1.1 < 0.55 then
+            if self.focussed and (uptime - self.cursorblinktime) % 1.1 < 0.55 then
                 love.graphics.setColor(200, 200, 200)
                 local x = textx + fonts.A:getWidth(self.value:sub(1, self.selectionstart)) * self.scale
                 love.graphics.setLineWidth(2)
@@ -216,6 +223,69 @@ function elements.button(obj)
         if key == " " or key == "return" then
             self:callback()
         end
+    end
+
+    return obj
+end
+
+-- A list of strings
+function elements.list(obj)
+    obj = validateOptions(obj, {
+        x        = { type= "number",   required= true            },
+        y        = { type= "number",   required= true            },
+        width    = { type= "number",   default= 150              },
+        scale    = { type= "number",   default= 5                },
+        strings  = { type= "table",    default= {}               },
+    })
+
+    if not obj then return false end
+
+    obj = validateOptions(obj, {
+        height   = { type= "number",   default= math.max(#obj.strings * 9 * obj.scale, 3 * 9 * obj.scale) },
+    })
+
+    obj.tabindex   = 0
+    obj.focussable = false
+
+    obj.draw = function (self)
+
+        -- -- Background
+        -- local lightness = (self.hovering and not (self.pressing or self.focussed and love.keyboard.isDown(" ", "return"))) and 150 or 100
+        -- love.graphics.setColor(lightness, lightness, lightness, 240)
+        -- love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+
+        -- -- Outline
+        -- if (self.pressing or self.focussed and love.keyboard.isDown(" ", "return")) or self.focussed then
+        --     love.graphics.setColor(250, 200, 100)
+        -- else
+        --     love.graphics.setColor(250, 250, 250)
+        -- end
+        -- love.graphics.setLineWidth(self.scale)
+        -- love.graphics.rectangle("line", self.x + self.scale / 2, self.y + self.scale / 2, self.width - self.scale, self.height - self.scale)
+
+        -- Strings
+        local y = self.y
+        for k,v in pairs(self.strings) do
+            love.graphics.setColor(250, 250, 250)
+            love.graphics.print(v, self.x, y + 3 * self.scale, 0, self.scale, self.scale, 0, 1)
+
+            y = y + 9 * self.scale
+        end
+    end
+
+    obj.addString = function (self, str)
+        table.insert(self.strings, str)
+    end
+
+    obj.removeString = function (self, str)
+        for k,v in pairs(self.strings) do
+            if v == str then
+                table.remove(self.strings, k)
+                return true
+            end
+        end
+
+        return false
     end
 
     return obj

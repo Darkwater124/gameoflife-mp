@@ -1,6 +1,7 @@
 net = {}
 net.hosting = false
 net.inLobby = false
+net.username = "whut"
 
 function net.startHostingLobby(port)
     port = tonumber(port)
@@ -10,13 +11,11 @@ function net.startHostingLobby(port)
 
     print("Started listening on port " .. port)
 
-    ui.clear()
-    ui.add(elements.text({ text  = "game of",  x = 280, y =  20, scale = 10 }))
-    ui.add(elements.text({ text  = "lIfe mp",  x = 280, y =  80, scale = 10 }))
-
     net.host = enet.host_create("localhost:" .. port)
     net.hosting = true
     net.inLobby = true
+
+    lobby.show()
 end
 
 function net.joinLobby(ip, port)
@@ -28,14 +27,12 @@ function net.joinLobby(ip, port)
 
     print("Joining " .. ip .. ":" .. port)
 
-    ui.clear()
-    ui.add(elements.text({ text  = "game of",  x = 280, y =  20, scale = 10 }))
-    ui.add(elements.text({ text  = "lIfe mp",  x = 280, y =  80, scale = 10 }))
-
     net.client = enet.host_create()
     net.server = net.client:connect(ip .. ":" .. port)
     net.hosting = false
     net.inLobby = true
+
+    lobby.show()
 end
 
 function net.update(dt)
@@ -50,12 +47,14 @@ function net.update(dt)
 
                     -- Client connected
                     print("Client connected", event.peer, event.peer:connect_id(), event.peer:index())
+                    event.peer:send(net.hostname)
 
 
                 elseif event.type == "receive" then
 
                     -- Client sent a message
                     print("Client sent msg ", event.peer, event.peer:connect_id(), event.peer:index(), event.data)
+                    ui.getElementById("lobby_players"):addString(event.data)
 
                 end
             end
@@ -68,12 +67,12 @@ function net.update(dt)
                 if event.type == "connect" then
 
                     -- Connected
-                    event.peer:send("hello world")
+                    event.peer:send(net.username)
 
                 elseif event.type == "receive" then
 
                     -- Message received
-                    print()
+                    lobby.setHostname(event.data)
 
                 end
             end
