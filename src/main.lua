@@ -16,11 +16,7 @@ function love.load()
 
 
     -- Initialization --
-        for k,v in pairs(patterns.galaxy) do
-            local x = v.x + 10
-            local y = v.y
-            table.insert(life.cells, {x=x, y=y})
-        end
+        life.cells = patterns.merge({}, patterns.bunnies, 36, 55, 0)
 
         background = love.graphics.newImage("res/background_grayscale.png")
         background:setFilter("linear", "linear")
@@ -54,8 +50,8 @@ function love.load()
 
 
     -- Set up UI --
-        ui.add(elements.text({ text  = "game of",  x = 280, y =  20, scale = 10 }))
-        ui.add(elements.text({ text  = "lIfe mp",  x = 280, y =  80, scale = 10 })) -- Capital I is 5x5, lowercase i is 3x5
+        ui.add(elements.text({ text  = "game of",  x = 210, y =  20, scale = 10 }))
+        ui.add(elements.text({ text  = "lIfe mp",  x = 210, y =  80, scale = 10 })) -- Capital I is 5x5, lowercase i is 3x5
 
 
         -- Join --
@@ -124,6 +120,7 @@ function love.draw()
 
 
     -- Draw life
+    love.graphics.setColor(255, 255, 255, 100)
     life.draw()
 
 

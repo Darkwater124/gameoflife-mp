@@ -81,7 +81,6 @@ function life.draw()
         love.graphics.scale(10)
 
         -- Draw cells
-        love.graphics.setColor(255, 255, 255, 230)
         for k,v in pairs(life.cells) do
             love.graphics.rectangle("fill", v.x, v.y, 1, 1)
         end
